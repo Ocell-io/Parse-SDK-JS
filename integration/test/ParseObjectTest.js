@@ -21,6 +21,7 @@ describe('Parse Object', () => {
       .then(o => {
         const o2 = new TestObject({ objectId: o.id });
         o2.set('test', 'changed');
+        o2.assumeCreated();
         return o2.save();
       })
       .then(o => {
@@ -1543,6 +1544,7 @@ describe('Parse Object', () => {
         itemsAgain.forEach((item, i) => {
           const newValue = i * 2;
           item.set('x', newValue);
+          item.assumeCreated(); // The objects we get from the array are pointers, which might be dangling, so we assure the SDK that they do indeed exist as actual objects.
         });
         return Parse.Object.saveAll(itemsAgain);
       })
@@ -1710,6 +1712,7 @@ describe('Parse Object', () => {
     const item2Again = itemsAgain[1];
 
     // Override item1 in database, this shouldn't fetch
+    item1Again.assumeCreated();
     await item1Again.save();
 
     const fetchedItems = await Parse.Object.fetchAllIfNeededWithInclude(
@@ -1745,6 +1748,7 @@ describe('Parse Object', () => {
         const itemsAgain = containerAgain.get('items');
         itemsAgain.forEach((item, i) => {
           item.set('x', i * 2);
+          item.assumeCreated();
         });
         return Parse.Object.saveAll(itemsAgain);
       })
@@ -2062,15 +2066,8 @@ describe('Parse Object', () => {
 
   it('allowCustomObjectId', async () => {
     await reconfigureServer({ allowCustomObjectId: true });
-    Parse.allowCustomObjectId = true;
     const customId = `${Date.now()}`;
     const object = new Parse.Object('TestObject');
-    try {
-      await object.save();
-      fail();
-    } catch (error) {
-      expect(error.message).toBe('objectId must not be empty, null or undefined');
-    }
     object.id = customId;
     object.set('foo', 'bar');
     await object.save();
@@ -2086,22 +2083,14 @@ describe('Parse Object', () => {
 
     const afterSave = await query.get(customId);
     expect(afterSave.get('foo')).toBe('baz');
-    Parse.allowCustomObjectId = false;
   });
 
   it('allowCustomObjectId saveAll', async () => {
     await reconfigureServer({ allowCustomObjectId: true });
-    Parse.allowCustomObjectId = true;
     const customId1 = `${Date.now()}`;
     const customId2 = `${Date.now()}`;
     const obj1 = new TestObject({ foo: 'bar' });
     const obj2 = new TestObject({ foo: 'baz' });
-    try {
-      await Parse.Object.saveAll([obj1, obj2]);
-      fail();
-    } catch (error) {
-      expect(error.message).toBe('objectId must not be empty, null or undefined');
-    }
     obj1.id = customId1;
     obj2.id = customId2;
     await Parse.Object.saveAll([obj1, obj2]);
@@ -2113,6 +2102,5 @@ describe('Parse Object', () => {
     results.forEach(result => {
       expect([customId1, customId2].includes(result.id));
     });
-    Parse.allowCustomObjectId = false;
   });
 });
