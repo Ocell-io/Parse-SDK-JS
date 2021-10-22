@@ -326,7 +326,6 @@ const config: Config & { [key: string]: any } = {
   FORCE_REVOCABLE_SESSION: false,
   ENCRYPTED_USER: false,
   IDEMPOTENCY: false,
-  ALLOW_CUSTOM_OBJECT_ID: false,
   PARSE_ERRORS: [],
 };
 

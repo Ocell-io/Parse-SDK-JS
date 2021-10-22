@@ -3038,7 +3038,7 @@ describe('ObjectController', () => {
     const result = objectController.save(p, {}).then(() => {
       expect(xhr.open.mock.calls[0]).toEqual([
         'POST',
-        'https://api.parse.com/1/classes/Person/pid',
+        'https://api.parse.com/1/classes/Person',
         true,
       ]);
       const body = JSON.parse(xhr.send.mock.calls[0]);
@@ -3912,8 +3912,7 @@ describe('ParseObject pin', () => {
     });
   });
 
-  it('can allowCustomObjectId', async () => {
-    CoreManager.set('ALLOW_CUSTOM_OBJECT_ID', true);
+  it('uses post for creating objects and put for updates', () => {
     const o = new ParseObject('Person');
     o.id = '';
     let params = o._getSaveParams();
@@ -3922,12 +3921,6 @@ describe('ParseObject pin', () => {
       body: { objectId: '' },
       path: 'classes/Person',
     });
-    await expect(o.save()).rejects.toEqual(
-      new ParseError(ParseError.MISSING_OBJECT_ID, 'objectId must not be empty or null')
-    );
-    await expect(ParseObject.saveAll([o])).rejects.toEqual(
-      new ParseError(ParseError.MISSING_OBJECT_ID, 'objectId must not be empty or null')
-    );
     o._finishFetch({
       objectId: 'CUSTOM_ID',
       createdAt: { __type: 'Date', iso: new Date().toISOString() },
@@ -3939,6 +3932,5 @@ describe('ParseObject pin', () => {
       body: {},
       path: 'classes/Person/CUSTOM_ID',
     });
-    CoreManager.set('ALLOW_CUSTOM_OBJECT_ID', false);
   });
 });

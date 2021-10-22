@@ -103,7 +103,6 @@ interface ParseType {
   encryptedUser: boolean;
   secret: string;
   idempotency: boolean;
-  allowCustomObjectId: boolean;
   IndexedDB?: any;
   _request(...args: any[]): void;
   _ajax(...args: any[]): void;
@@ -365,17 +364,6 @@ const Parse: ParseType = {
   },
   get idempotency() {
     return CoreManager.get('IDEMPOTENCY');
-  },
-
-  /**
-   * @member {boolean} Parse.allowCustomObjectId
-   * @static
-   */
-  set allowCustomObjectId(value) {
-    CoreManager.set('ALLOW_CUSTOM_OBJECT_ID', value);
-  },
-  get allowCustomObjectId() {
-    return CoreManager.get('ALLOW_CUSTOM_OBJECT_ID');
   },
 
   _request(...args) {

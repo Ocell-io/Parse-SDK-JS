@@ -228,6 +228,7 @@ class ParseInstallation extends ParseObject {
       // The installation was deleted from the server.
       // We always want fetch to succeed.
       delete this.id;
+      delete this._getServerData()['createdAt']; // Force a POST instead of a PUT
       this._getId(); // Generate localId
       this._markAllFieldsDirty();
       await super.save.apply(this, args);
@@ -253,6 +254,7 @@ class ParseInstallation extends ParseObject {
       // The installation was deleted from the server.
       // We always want save to succeed.
       delete this.id;
+      delete this._getServerData()['createdAt']; // Force a POST instead of a PUT
       this._getId(); // Generate localId
       this._markAllFieldsDirty();
       await super.save.apply(this, args);
