@@ -21,6 +21,7 @@ describe('Parse Object', () => {
       .then(o => {
         const o2 = new TestObject({ objectId: o.id });
         o2.set('test', 'changed');
+        o2.assumeCreated();
         return o2.save();
       })
       .then(o => {
@@ -1541,6 +1542,7 @@ describe('Parse Object', () => {
         itemsAgain.forEach((item, i) => {
           const newValue = i * 2;
           item.set('x', newValue);
+          item.assumeCreated(); // The objects we get from the array are pointers, which might be dangling, so we assure the SDK that they do indeed exist as actual objects.
         });
         return Parse.Object.saveAll(itemsAgain);
       })
@@ -1696,6 +1698,7 @@ describe('Parse Object', () => {
     const item2Again = itemsAgain[1];
 
     // Override item1 in database, this shouldn't fetch
+    item1Again.assumeCreated();
     await item1Again.save();
 
     const fetchedItems = await Parse.Object.fetchAllIfNeededWithInclude(
@@ -1731,6 +1734,7 @@ describe('Parse Object', () => {
         const itemsAgain = containerAgain.get('items');
         itemsAgain.forEach((item, i) => {
           item.set('x', i * 2);
+          item.assumeCreated();
         });
         return Parse.Object.saveAll(itemsAgain);
       })
@@ -2047,44 +2051,34 @@ describe('Parse Object', () => {
   describe('allowCustomObjectId', () => {
     it('can save without setting an objectId', async () => {
       await reconfigureServer({ allowCustomObjectId: true });
-      Parse.allowCustomObjectId = true;
 
       const object = new Parse.Object('TestObject');
       await object.save();
       expect(object.id).toBeDefined();
-
-      Parse.allowCustomObjectId = false;
     });
 
     it('fails to save when objectId is empty', async () => {
       await reconfigureServer({ allowCustomObjectId: true });
-      Parse.allowCustomObjectId = true;
 
       const object = new Parse.Object('TestObject');
       object.id = '';
       await expectAsync(object.save()).toBeRejectedWith(
         new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'objectId must not be empty or null')
       );
-
-      Parse.allowCustomObjectId = false;
     });
 
     it('fails to save when objectId is null', async () => {
       await reconfigureServer({ allowCustomObjectId: true });
-      Parse.allowCustomObjectId = true;
 
       const object = new Parse.Object('TestObject');
       object.id = null;
       await expectAsync(object.save()).toBeRejectedWith(
         new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'objectId must not be empty or null')
       );
-
-      Parse.allowCustomObjectId = false;
     });
 
     it('can save with custom objectId', async () => {
       await reconfigureServer({ allowCustomObjectId: true });
-      Parse.allowCustomObjectId = true;
 
       const customId = `${Date.now()}`;
       const object = new Parse.Object('TestObject');
@@ -2103,28 +2097,22 @@ describe('Parse Object', () => {
 
       const afterSave = await query.get(customId);
       expect(afterSave.get('foo')).toBe('baz');
-
-      Parse.allowCustomObjectId = false;
     });
   });
 
   describe('allowCustomObjectId saveAll', () => {
     it('can save without setting an objectId', async () => {
       await reconfigureServer({ allowCustomObjectId: true });
-      Parse.allowCustomObjectId = true;
 
       const obj1 = new TestObject({ foo: 'bar' });
       const obj2 = new TestObject({ foo: 'baz' });
       await Parse.Object.saveAll([obj1, obj2]);
       expect(obj1.id).toBeDefined();
       expect(obj2.id).toBeDefined();
-
-      Parse.allowCustomObjectId = false;
     });
 
     it('fails to save when objectId is empty', async () => {
       await reconfigureServer({ allowCustomObjectId: true });
-      Parse.allowCustomObjectId = true;
 
       const obj1 = new TestObject({ foo: 'bar' });
       obj1.id = '';
@@ -2133,13 +2121,10 @@ describe('Parse Object', () => {
       await expectAsync(Parse.Object.saveAll([obj1, obj2])).toBeRejectedWith(
         new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'objectId must not be empty or null')
       );
-
-      Parse.allowCustomObjectId = false;
     });
 
     it('fails to save when objectId is null', async () => {
       await reconfigureServer({ allowCustomObjectId: true });
-      Parse.allowCustomObjectId = true;
 
       const obj1 = new TestObject({ foo: 'bar' });
       obj1.id = null;
@@ -2148,13 +2133,10 @@ describe('Parse Object', () => {
       await expectAsync(Parse.Object.saveAll([obj1, obj2])).toBeRejectedWith(
         new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'objectId must not be empty or null')
       );
-
-      Parse.allowCustomObjectId = false;
     });
 
     it('can save with custom objectId', async () => {
       await reconfigureServer({ allowCustomObjectId: true });
-      Parse.allowCustomObjectId = true;
 
       const obj1 = new TestObject({ foo: 'bar' });
       const customId1 = `${Date.now()}`;
@@ -2171,8 +2153,6 @@ describe('Parse Object', () => {
       results.forEach(result => {
         expect([customId1, customId2].includes(result.id));
       });
-
-      Parse.allowCustomObjectId = false;
     });
   });
 });

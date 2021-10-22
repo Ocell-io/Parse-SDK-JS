@@ -317,22 +317,12 @@ class ParseObject {
   }
 
   _getSaveParams(): SaveParams {
-    let method = this.id ? 'PUT' : 'POST';
+    const method = this._assumeCreated || this.createdAt ? 'PUT' : 'POST';
     const body = this._getSaveJSON();
-    let path = 'classes/' + this.className;
-    if (CoreManager.get('ALLOW_CUSTOM_OBJECT_ID')) {
-      if (!this.createdAt) {
-        method = 'POST';
-        body.objectId = this.id;
-      } else {
-        method = 'PUT';
-        path += '/' + this.id;
-      }
-    } else if (this.id) {
-      path += '/' + this.id;
-    } else if (this.className === '_User') {
-      path = 'users';
-    }
+    let path = this.className === '_User' ? 'users' : 'classes/' + this.className;
+    if (method === 'PUT') path += '/' + this.id;
+    // POST
+    else body.objectId = this.id; // Might be undefined. That's fine.
     return {
       method,
       body,
@@ -914,7 +904,7 @@ class ParseObject {
    */
   op(attr: string): ?Op {
     const pending = this._getPendingOps();
-    for (let i = pending.length; i--;) {
+    for (let i = pending.length; i--; ) {
       if (pending[i][attr]) {
         return pending[i][attr];
       }
@@ -1225,6 +1215,15 @@ class ParseObject {
       }
     }
     return this;
+  }
+
+  /**
+   * Assume that this object exists on the server.
+   * Only for objects with a set id.
+   * This will force save() to do a PUT instead of a POST.
+   */
+  assumeCreated() {
+    this._assumeCreated = true;
   }
 
   /**
@@ -2383,7 +2382,6 @@ const DefaultController = {
 
     const RESTController = CoreManager.getRESTController();
     const stateController = CoreManager.getObjectStateController();
-    const allowCustomObjectId = CoreManager.get('ALLOW_CUSTOM_OBJECT_ID');
 
     options = options || {};
     options.returnStatus = options.returnStatus || true;
@@ -2420,7 +2418,7 @@ const DefaultController = {
             const batch = [];
             const nextPending = [];
             pending.forEach(el => {
-              if (allowCustomObjectId && Object.prototype.hasOwnProperty.call(el, 'id') && !el.id) {
+              if (Object.prototype.hasOwnProperty.call(el, 'id') && !el.id) {
                 throw new ParseError(
                   ParseError.MISSING_OBJECT_ID,
                   'objectId must not be empty or null'
@@ -2511,7 +2509,7 @@ const DefaultController = {
         });
       });
     } else if (target instanceof ParseObject) {
-      if (allowCustomObjectId && Object.prototype.hasOwnProperty.call(target, 'id') && !target.id) {
+      if (typeof target.id !== 'undefined' && !target.id) {
         throw new ParseError(ParseError.MISSING_OBJECT_ID, 'objectId must not be empty or null');
       }
       // generate _localId in case if cascadeSave=false

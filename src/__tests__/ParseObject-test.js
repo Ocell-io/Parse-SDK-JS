@@ -126,12 +126,13 @@ const mockLocalDatastore = {
     const objectKey = mockLocalDatastore.getKeyForObject(object);
   }),
   _updateObjectIfPinned: jest.fn(),
-  getKeyForObject: jest.fn((object) => {
+  getKeyForObject: jest.fn(object => {
     // (Taken from LocalDataStore source) This fails for nested objects that are not ParseObject
     const objectId = object.objectId || object._getId();
     const OBJECT_PREFIX = 'Parse_LDS_';
     return `${OBJECT_PREFIX}${object.className}_${objectId}`;
-  }), updateFromServer: jest.fn(),
+  }),
+  updateFromServer: jest.fn(),
   _clear: jest.fn(),
   checkIfEnabled: jest.fn(() => {
     if (!mockLocalDatastore.isEnabled) {
@@ -2355,7 +2356,7 @@ describe('ParseObject', () => {
     expect(controller.ajax).toHaveBeenCalledTimes(0);
   });
 
-  it('can save an array of objects', (done) => {
+  it('can save an array of objects', done => {
     const xhr = {
       setRequestHeader: jest.fn(),
       open: jest.fn(),
@@ -2393,7 +2394,7 @@ describe('ParseObject', () => {
     });
   });
 
-  it('can saveAll with batchSize', (done) => {
+  it('can saveAll with batchSize', done => {
     const xhrs = [];
     for (let i = 0; i < 2; i++) {
       xhrs[i] = {
@@ -2454,7 +2455,7 @@ describe('ParseObject', () => {
     });
   });
 
-  it('can saveAll with global batchSize', (done) => {
+  it('can saveAll with global batchSize', done => {
     const xhrs = [];
     for (let i = 0; i < 2; i++) {
       xhrs[i] = {
@@ -2515,7 +2516,7 @@ describe('ParseObject', () => {
     });
   });
 
-  it('returns the first error when saving an array of objects', (done) => {
+  it('returns the first error when saving an array of objects', done => {
     const xhrs = [];
     for (let i = 0; i < 2; i++) {
       xhrs[i] = {
@@ -2576,7 +2577,7 @@ describe('ObjectController', () => {
     jest.clearAllMocks();
   });
 
-  it('can fetch a single object', (done) => {
+  it('can fetch a single object', done => {
     const objectController = CoreManager.getObjectController();
     const xhr = {
       setRequestHeader: jest.fn(),
@@ -2952,7 +2953,7 @@ describe('ObjectController', () => {
     const result = objectController.save(p, {}).then(() => {
       expect(xhr.open.mock.calls[0]).toEqual([
         'POST',
-        'https://api.parse.com/1/classes/Person/pid',
+        'https://api.parse.com/1/classes/Person',
         true,
       ]);
       const body = JSON.parse(xhr.send.mock.calls[0]);
@@ -3826,8 +3827,7 @@ describe('ParseObject pin', () => {
     });
   });
 
-  it('can allowCustomObjectId', async () => {
-    CoreManager.set('ALLOW_CUSTOM_OBJECT_ID', true);
+  it('uses post for creating objects and put for updates', () => {
     const o = new ParseObject('Person');
     o.id = '';
     let params = o._getSaveParams();
@@ -3836,12 +3836,6 @@ describe('ParseObject pin', () => {
       body: { objectId: '' },
       path: 'classes/Person',
     });
-    await expect(o.save()).rejects.toEqual(
-      new ParseError(ParseError.MISSING_OBJECT_ID, 'objectId must not be empty or null')
-    );
-    await expect(ParseObject.saveAll([o])).rejects.toEqual(
-      new ParseError(ParseError.MISSING_OBJECT_ID, 'objectId must not be empty or null')
-    );
     o._finishFetch({
       objectId: 'CUSTOM_ID',
       createdAt: { __type: 'Date', iso: new Date().toISOString() },
@@ -3853,6 +3847,5 @@ describe('ParseObject pin', () => {
       body: {},
       path: 'classes/Person/CUSTOM_ID',
     });
-    CoreManager.set('ALLOW_CUSTOM_OBJECT_ID', false);
   });
 });

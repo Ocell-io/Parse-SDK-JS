@@ -7,31 +7,31 @@ import InstallationController from './InstallationController';
 import * as ParseOp from './ParseOp';
 import RESTController from './RESTController';
 import ACL from './ParseACL';
-import * as Analytics from './Analytics'
-import AnonymousUtils from './AnonymousUtils'
+import * as Analytics from './Analytics';
+import AnonymousUtils from './AnonymousUtils';
 import * as Cloud from './Cloud';
 import CLP from './ParseCLP';
 import CoreManager from './CoreManager';
 import EventEmitter from './EventEmitter';
-import Config from './ParseConfig'
-import ParseError from './ParseError'
-import FacebookUtils from './FacebookUtils'
-import File from './ParseFile'
-import GeoPoint from './ParseGeoPoint'
-import Polygon from './ParsePolygon'
-import Installation from './ParseInstallation'
-import LocalDatastore from './LocalDatastore'
-import Object from './ParseObject'
-import * as Push from './Push'
-import Query from './ParseQuery'
-import Relation from './ParseRelation'
-import Role from './ParseRole'
-import Schema from './ParseSchema'
-import Session from './ParseSession'
-import Storage from './Storage'
-import User from './ParseUser'
-import LiveQuery from './ParseLiveQuery'
-import LiveQueryClient from './LiveQueryClient'
+import Config from './ParseConfig';
+import ParseError from './ParseError';
+import FacebookUtils from './FacebookUtils';
+import File from './ParseFile';
+import GeoPoint from './ParseGeoPoint';
+import Polygon from './ParsePolygon';
+import Installation from './ParseInstallation';
+import LocalDatastore from './LocalDatastore';
+import Object from './ParseObject';
+import * as Push from './Push';
+import Query from './ParseQuery';
+import Relation from './ParseRelation';
+import Role from './ParseRole';
+import Schema from './ParseSchema';
+import Session from './ParseSession';
+import Storage from './Storage';
+import User from './ParseUser';
+import LiveQuery from './ParseLiveQuery';
+import LiveQueryClient from './LiveQueryClient';
 
 /**
  * Contains all Parse API classes and functions.
@@ -40,113 +40,112 @@ import LiveQueryClient from './LiveQueryClient'
  * @global
  * @class
  * @hideconstructor
-*/
+ */
 
 interface ParseType {
-  ACL: typeof ACL,
-  Parse?: ParseType,
-  Analytics: typeof Analytics,
-  AnonymousUtils: typeof AnonymousUtils,
-  Cloud: typeof Cloud,
-  CLP: typeof CLP,
-  CoreManager: typeof CoreManager,
-  Config: typeof Config,
-  Error: typeof ParseError,
-  EventuallyQueue: typeof EventuallyQueue,
-  FacebookUtils: typeof FacebookUtils,
-  File: typeof File,
-  GeoPoint: typeof GeoPoint,
-  Hooks?: any,
-  Polygon: typeof Polygon,
-  Installation: typeof Installation,
-  LocalDatastore: typeof LocalDatastore,
-  Object: typeof Object,
+  ACL: typeof ACL;
+  Parse?: ParseType;
+  Analytics: typeof Analytics;
+  AnonymousUtils: typeof AnonymousUtils;
+  Cloud: typeof Cloud;
+  CLP: typeof CLP;
+  CoreManager: typeof CoreManager;
+  Config: typeof Config;
+  Error: typeof ParseError;
+  EventuallyQueue: typeof EventuallyQueue;
+  FacebookUtils: typeof FacebookUtils;
+  File: typeof File;
+  GeoPoint: typeof GeoPoint;
+  Hooks?: any;
+  Polygon: typeof Polygon;
+  Installation: typeof Installation;
+  LocalDatastore: typeof LocalDatastore;
+  Object: typeof Object;
   Op: {
-    Set: typeof ParseOp.SetOp,
-    Unset: typeof ParseOp.UnsetOp,
-    Increment: typeof ParseOp.IncrementOp,
-    Add: typeof ParseOp.AddOp,
-    Remove: typeof ParseOp.RemoveOp,
-    AddUnique: typeof ParseOp.AddUniqueOp,
-    Relation: typeof ParseOp.RelationOp,
+    Set: typeof ParseOp.SetOp;
+    Unset: typeof ParseOp.UnsetOp;
+    Increment: typeof ParseOp.IncrementOp;
+    Add: typeof ParseOp.AddOp;
+    Remove: typeof ParseOp.RemoveOp;
+    AddUnique: typeof ParseOp.AddUniqueOp;
+    Relation: typeof ParseOp.RelationOp;
   };
-  Push: typeof Push,
-  Query: typeof Query,
-  Relation: typeof Relation,
-  Role: typeof Role,
-  Schema: typeof Schema,
-  Session: typeof Session,
-  Storage: typeof Storage,
-  User: typeof User,
-  LiveQuery?: typeof LiveQuery,
-  LiveQueryClient: typeof LiveQueryClient,
+  Push: typeof Push;
+  Query: typeof Query;
+  Relation: typeof Relation;
+  Role: typeof Role;
+  Schema: typeof Schema;
+  Session: typeof Session;
+  Storage: typeof Storage;
+  User: typeof User;
+  LiveQuery?: typeof LiveQuery;
+  LiveQueryClient: typeof LiveQueryClient;
 
-  initialize(applicationId: string, javaScriptKey: string): void,
-  _initialize(applicationId: string, javaScriptKey: string, masterKey?: string): void,
-  setAsyncStorage(storage: any): void,
-  setLocalDatastoreController(controller: any): void,
-  getServerHealth(): Promise<any>
+  initialize(applicationId: string, javaScriptKey: string): void;
+  _initialize(applicationId: string, javaScriptKey: string, masterKey?: string): void;
+  setAsyncStorage(storage: any): void;
+  setLocalDatastoreController(controller: any): void;
+  getServerHealth(): Promise<any>;
 
-  applicationId: string,
-  javaScriptKey: string,
-  masterKey: string,
-  serverURL: string,
-  serverAuthToken: string,
-  serverAuthType: string,
-  liveQueryServerURL: string,
-  encryptedUser: boolean,
-  secret: string,
-  idempotency: boolean,
-  allowCustomObjectId: boolean,
-  IndexedDB?: any,
-  _request(...args: any[]): void,
-  _ajax(...args: any[]): void,
-  _decode(...args: any[]): void,
-  _encode(...args: any[]): void,
-  _getInstallationId?(): string,
-  enableLocalDatastore(polling: boolean, ms: number): void,
-  isLocalDatastoreEnabled(): boolean,
-  dumpLocalDatastore(): void,
-  enableEncryptedUser(): void,
-  isEncryptedUserEnabled(): void,
+  applicationId: string;
+  javaScriptKey: string;
+  masterKey: string;
+  serverURL: string;
+  serverAuthToken: string;
+  serverAuthType: string;
+  liveQueryServerURL: string;
+  encryptedUser: boolean;
+  secret: string;
+  idempotency: boolean;
+  IndexedDB?: any;
+  _request(...args: any[]): void;
+  _ajax(...args: any[]): void;
+  _decode(...args: any[]): void;
+  _encode(...args: any[]): void;
+  _getInstallationId?(): string;
+  enableLocalDatastore(polling: boolean, ms: number): void;
+  isLocalDatastoreEnabled(): boolean;
+  dumpLocalDatastore(): void;
+  enableEncryptedUser(): void;
+  isEncryptedUserEnabled(): void;
 }
 
 const Parse: ParseType = {
   ACL: ACL,
   Analytics: Analytics,
-  AnonymousUtils:  AnonymousUtils,
+  AnonymousUtils: AnonymousUtils,
   Cloud: Cloud,
   CLP: CLP,
-  CoreManager:  CoreManager,
-  Config:  Config,
-  Error:  ParseError,
-  EventuallyQueue:  EventuallyQueue,
+  CoreManager: CoreManager,
+  Config: Config,
+  Error: ParseError,
+  EventuallyQueue: EventuallyQueue,
   FacebookUtils: FacebookUtils,
-  File:  File,
-  GeoPoint:  GeoPoint,
-  Polygon:  Polygon,
-  Installation:  Installation,
-  LocalDatastore:  LocalDatastore,
-  Object:  Object,
+  File: File,
+  GeoPoint: GeoPoint,
+  Polygon: Polygon,
+  Installation: Installation,
+  LocalDatastore: LocalDatastore,
+  Object: Object,
   Op: {
-    Set:  ParseOp.SetOp,
-    Unset:  ParseOp.UnsetOp,
-    Increment:  ParseOp.IncrementOp,
-    Add:  ParseOp.AddOp,
-    Remove:  ParseOp.RemoveOp,
-    AddUnique:  ParseOp.AddUniqueOp,
-    Relation:  ParseOp.RelationOp,
+    Set: ParseOp.SetOp,
+    Unset: ParseOp.UnsetOp,
+    Increment: ParseOp.IncrementOp,
+    Add: ParseOp.AddOp,
+    Remove: ParseOp.RemoveOp,
+    AddUnique: ParseOp.AddUniqueOp,
+    Relation: ParseOp.RelationOp,
   },
-  Push:  Push,
-  Query:  Query,
-  Relation:  Relation,
-  Role:  Role,
-  Schema:  Schema,
-  Session:  Session,
-  Storage:  Storage,
-  User:  User,
-  LiveQueryClient:  LiveQueryClient,
-  LiveQuery:  undefined,
+  Push: Push,
+  Query: Query,
+  Relation: Relation,
+  Role: Role,
+  Schema: Schema,
+  Session: Session,
+  Storage: Storage,
+  User: User,
+  LiveQueryClient: LiveQueryClient,
+  LiveQuery: undefined,
   IndexedDB: undefined,
   Hooks: undefined,
   Parse: undefined,
@@ -186,7 +185,10 @@ const Parse: ParseType = {
     CoreManager.setIfNeeded('LiveQuery', Parse.LiveQuery);
 
     if (process.env.PARSE_BUILD === 'browser') {
-      Parse.IndexedDB = CoreManager.setIfNeeded('IndexedDBStorageController', IndexedDBStorageController);
+      Parse.IndexedDB = CoreManager.setIfNeeded(
+        'IndexedDBStorageController',
+        IndexedDBStorageController
+      );
     }
   },
 
@@ -333,17 +335,6 @@ const Parse: ParseType = {
     return CoreManager.get('IDEMPOTENCY');
   },
 
-  /**
-   * @member {boolean} Parse.allowCustomObjectId
-   * @static
-   */
-  set allowCustomObjectId(value) {
-    CoreManager.set('ALLOW_CUSTOM_OBJECT_ID', value);
-  },
-  get allowCustomObjectId() {
-    return CoreManager.get('ALLOW_CUSTOM_OBJECT_ID');
-  },
-
   _request(...args) {
     return CoreManager.getRESTController().request.apply(null, args);
   },
@@ -361,7 +352,7 @@ const Parse: ParseType = {
     return encode(value, disallowObjects);
   },
 
-  _getInstallationId () {
+  _getInstallationId() {
     return CoreManager.getInstallationController().currentInstallationId();
   },
   /**
@@ -390,7 +381,7 @@ const Parse: ParseType = {
    * @static
    * @returns {boolean}
    */
-  isLocalDatastoreEnabled () {
+  isLocalDatastoreEnabled() {
     return this.LocalDatastore.isEnabled;
   },
   /**
@@ -418,7 +409,7 @@ const Parse: ParseType = {
    *
    * @static
    */
-  enableEncryptedUser () {
+  enableEncryptedUser() {
     this.encryptedUser = true;
   },
 
@@ -428,7 +419,7 @@ const Parse: ParseType = {
    * @static
    * @returns {boolean}
    */
-  isEncryptedUserEnabled () {
+  isEncryptedUserEnabled() {
     return this.encryptedUser;
   },
 };
