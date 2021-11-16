@@ -884,6 +884,12 @@ describe('ParseObject', () => {
 
     expect(
       o.validate({
+        'nested.key.ö': 12,
+      })
+    ).toEqual(false);
+
+    expect(
+      o.validate({
         noProblem: 'here',
       })
     ).toBe(false);
