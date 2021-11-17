@@ -661,6 +661,20 @@ describe('ParseObject', () => {
     });
   });
 
+  it('can set nested fields with non-english characters', () => {
+    const o = new ParseObject('Person');
+    o._finishFetch({
+      objectId: 'setNestedNonEnglish',
+      objectField: {},
+    });
+
+    o.set('objectField.keyöü', 0);
+
+    expect(o.attributes).toEqual({
+      objectField: { keyöü: 0 },
+    });
+  });
+
   it('can increment a nested field', () => {
     const o = new ParseObject('Person');
     o._finishFetch({
