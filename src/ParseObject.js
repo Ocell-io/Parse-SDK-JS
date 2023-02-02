@@ -322,7 +322,7 @@ class ParseObject {
     let path = this.className === '_User' ? 'users' : 'classes/' + this.className;
     if (method === 'PUT') path += '/' + this.id;
     // POST
-    else body.objectId = this.id; // Might be undefined. That's fine.
+    else if (typeof this.id !== 'undefined') body.objectId = this.id;
     return {
       method,
       body,
