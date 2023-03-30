@@ -1,11 +1,4 @@
 /**
- * Copyright (c) 2015-present, Parse, LLC.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
  * @flow
  */
 
@@ -425,6 +418,12 @@ class ParseUser extends ParseObject {
     if (options.hasOwnProperty('installationId')) {
       signupOptions.installationId = options.installationId;
     }
+    if (
+      options.hasOwnProperty('context') &&
+      Object.prototype.toString.call(options.context) === '[object Object]'
+    ) {
+      signupOptions.context = options.context;
+    }
 
     const controller = CoreManager.getUserController();
     return controller.signUp(this, attrs, signupOptions);
@@ -779,7 +778,7 @@ class ParseUser extends ParseObject {
    * Request an email verification.
    *
    * @param {string} email The email address associated with the user that
-   *     forgot their password.
+   *     needs to verify their email.
    * @param {object} options
    * @static
    * @returns {Promise}

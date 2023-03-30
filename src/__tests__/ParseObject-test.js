@@ -1,12 +1,3 @@
-/**
- * Copyright (c) 2015-present, Parse, LLC.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
-
 jest.dontMock('../arrayContainsObject');
 jest.dontMock('../canBeSerialized');
 jest.dontMock('../CoreManager');
@@ -3557,6 +3548,24 @@ describe('ParseObject extensions', () => {
     ParseObject.enableSingleInstance();
   });
 
+  it('can extend object', () => {
+    const startExtend = Date.now();
+    for (let i = 0; i < 100000; i++) {
+      // eslint-disable-next-line
+      const Parent = ParseObject.extend('Parent');
+      // eslint-disable-next-line
+      const parent = new Parent();
+    }
+    expect(Date.now() - startExtend).toBeLessThan(200);
+
+    const startNew = Date.now();
+    for (let i = 0; i < 100000; i++) {
+      // eslint-disable-next-line
+      const parent = new ParseObject('Parent');
+    }
+    expect(Date.now() - startNew).toBeLessThan(200);
+  });
+
   it('can generate ParseObjects with a default className', () => {
     const YourObject = ParseObject.extend('YourObject');
     const yo = new YourObject();
@@ -3848,14 +3857,21 @@ describe('ParseObject pin', () => {
     });
   });
 
-  it('uses post for creating objects and put for updates', async done => {
+  it('uses post for creating objects and put for updates', async () => {
     const o = new ParseObject('Person');
+    o.id = '';
     let params = o._getSaveParams();
     expect(params).toEqual({
       method: 'POST',
-      body: { objectId: undefined },
+      body: { objectId: '' },
       path: 'classes/Person',
     });
+    await expect(o.save()).rejects.toEqual(
+      new ParseError(ParseError.MISSING_OBJECT_ID, 'objectId must not be empty or null')
+    );
+    await expect(ParseObject.saveAll([o])).rejects.toEqual(
+      new ParseError(ParseError.MISSING_OBJECT_ID, 'objectId must not be empty or null')
+    );
     o._finishFetch({
       objectId: 'CUSTOM_ID',
       createdAt: { __type: 'Date', iso: new Date().toISOString() },
@@ -3867,6 +3883,5 @@ describe('ParseObject pin', () => {
       body: {},
       path: 'classes/Person/CUSTOM_ID',
     });
-    done();
   });
 });

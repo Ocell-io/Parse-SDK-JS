@@ -1,11 +1,4 @@
 /*
- * Copyright (c) 2015-present, Parse, LLC.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
  * @flow
  */
 
@@ -832,7 +825,7 @@ class ParseQuery {
       if (!Array.isArray(pipeline)) {
         pipeline = [pipeline];
       }
-      pipeline.unshift({ match: this._where });
+      pipeline.unshift({ $match: this._where });
     }
 
     const params = {
@@ -990,6 +983,9 @@ class ParseQuery {
     if (options.hasOwnProperty('context') && typeof options.context === 'object') {
       findOptions.context = options.context;
     }
+    if (options.hasOwnProperty('json')) {
+      findOptions.json = options.json;
+    }
 
     let finished = false;
     let previousResults = [];
@@ -1030,6 +1026,7 @@ class ParseQuery {
    *     be used for this request.
    *   <li>sessionToken: A valid session token, used for making a request on
    *       behalf of a specific user.
+   *   <li>json: Return raw json without converting to Parse.Object
    * </ul>
    * @returns {Promise} A promise that will be fulfilled once the
    *     iteration has completed.

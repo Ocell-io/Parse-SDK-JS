@@ -1,11 +1,4 @@
 /**
- * Copyright (c) 2015-present, Parse, LLC.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
  * @flow
  */
 /* global XMLHttpRequest, Blob */
@@ -41,8 +34,6 @@ export type FileSource =
       uri: string,
       type: string,
     };
-
-const dataUriRegexp = /^data:([a-zA-Z]+\/[-a-zA-Z0-9+.]+)(;charset=[a-zA-Z0-9\-\/]*)?;base64,/;
 
 function b64Digit(number: number): string {
   if (number < 26) {
@@ -137,26 +128,17 @@ class ParseFile {
           type: specifiedType,
         };
       } else if (data && typeof data.base64 === 'string') {
-        const base64 = data.base64;
-        const commaIndex = base64.indexOf(',');
-
-        if (commaIndex !== -1) {
-          const matches = dataUriRegexp.exec(base64.slice(0, commaIndex + 1));
-          // if data URI with type and charset, there will be 4 matches.
-          this._data = base64.slice(commaIndex + 1);
-          this._source = {
-            format: 'base64',
-            base64: this._data,
-            type: matches[1],
-          };
-        } else {
-          this._data = base64;
-          this._source = {
-            format: 'base64',
-            base64: base64,
-            type: specifiedType,
-          };
-        }
+        const base64 = data.base64.split(',').slice(-1)[0];
+        const dataType =
+          specifiedType ||
+          data.base64.split(';').slice(0, 1)[0].split(':').slice(1, 2)[0] ||
+          'text/plain';
+        this._data = base64;
+        this._source = {
+          format: 'base64',
+          base64,
+          type: dataType,
+        };
       } else {
         throw new TypeError('Cannot create a Parse.File with that data.');
       }

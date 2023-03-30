@@ -1,12 +1,3 @@
-/**
- * Copyright (c) 2015-present, Parse, LLC.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
-
 jest.autoMockOff();
 jest.useFakeTimers();
 jest.mock('../uuid', () => {
@@ -568,6 +559,20 @@ describe('RESTController', () => {
         done();
       }
     );
+  });
+
+  it('does not set upload progress listener when callback is not provided to avoid CORS pre-flight', () => {
+    const xhr = {
+      setRequestHeader: jest.fn(),
+      open: jest.fn(),
+      upload: jest.fn(),
+      send: jest.fn(),
+    };
+    RESTController._setXHR(function () {
+      return xhr;
+    });
+    RESTController.ajax('POST', 'users', {});
+    expect(xhr.upload.onprogress).toBeUndefined();
   });
 
   it('does not upload progress when total is uncomputable', done => {

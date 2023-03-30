@@ -12,7 +12,7 @@ const watch      = require('gulp-watch');
 const BUILD = process.env.PARSE_BUILD || 'browser';
 const VERSION = require('./package.json').version;
 
-const transformRuntime = ["@babel/plugin-transform-runtime", {
+const transformRuntime = ["@babel/transform-runtime", {
   "corejs": 3,
   "helpers": true,
   "regenerator": true,
@@ -22,12 +22,12 @@ const transformRuntime = ["@babel/plugin-transform-runtime", {
 const PRESETS = {
   'browser': [["@babel/preset-env", {
     "targets": "> 0.25%, not dead"
-  }], '@babel/preset-react'],
+  }]],
   'weapp': [["@babel/preset-env", {
     "targets": "> 0.25%, not dead"
-  }], '@babel/preset-react'],
+  }], '@babel/react'],
   'node': [["@babel/preset-env", {
-    "targets": { "node": "8" }
+    "targets": { "node": "14" }
   }]],
   'react-native': ['module:metro-react-native-babel-preset'],
 };
@@ -53,14 +53,15 @@ const FULL_HEADER = (
   '/**\n' +
   ' * Parse JavaScript SDK v' + VERSION + '\n' +
   ' *\n' +
-  ' * Copyright (c) 2015-present, Parse, LLC.\n' +
+  ' * Copyright 2015-present Parse Platform\n' +
   ' * All rights reserved.\n' +
   ' *\n' +
   ' * The source tree of this library can be found at\n' +
   ' *   https://github.com/ParsePlatform/Parse-SDK-JS\n' +
-  ' * This source code is licensed under the BSD-style license found in the\n' +
-  ' * LICENSE file in the root directory of this source tree. An additional grant\n' +
-  ' * of patent rights can be found in the PATENTS file in the same directory.\n' +
+  ' *\n' +
+  ' * This source code is licensed under the license found in the LICENSE\n' +
+  ' * file in the root directory of this source tree. Additional legal\n' +
+  ' * information can be found in the NOTICE file in the same directory.\n' +
   ' */\n'
 );
 

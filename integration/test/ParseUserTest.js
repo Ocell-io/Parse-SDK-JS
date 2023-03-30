@@ -3,6 +3,7 @@
 const assert = require('assert');
 const Parse = require('../../node');
 const uuidv4 = require('uuid/v4');
+const { twitterAuthData } = require('./helper');
 
 class CustomUser extends Parse.User {
   constructor(attributes) {
@@ -184,6 +185,7 @@ describe('Parse User', () => {
   });
 
   it('cannot save non-authed user', done => {
+    Parse.User.enableUnsafeCurrentUser();
     let user = new Parse.User();
     let notAuthed = null;
     user.set({
@@ -219,6 +221,7 @@ describe('Parse User', () => {
   });
 
   it('cannot delete non-authed user', done => {
+    Parse.User.enableUnsafeCurrentUser();
     let user = new Parse.User();
     let notAuthed = null;
     user
@@ -251,6 +254,7 @@ describe('Parse User', () => {
   });
 
   it('cannot saveAll with non-authed user', done => {
+    Parse.User.enableUnsafeCurrentUser();
     let user = new Parse.User();
     let notAuthed = null;
     user
@@ -434,6 +438,7 @@ describe('Parse User', () => {
   });
 
   it('can query for users', done => {
+    Parse.User.enableUnsafeCurrentUser();
     const user = new Parse.User();
     user.set('password', 'asdf');
     user.set('email', 'asdf@exxample.com');
@@ -456,6 +461,7 @@ describe('Parse User', () => {
   });
 
   it('preserves the session token when querying the current user', done => {
+    Parse.User.enableUnsafeCurrentUser();
     const user = new Parse.User();
     user.set('password', 'asdf');
     user.set('email', 'asdf@example.com');
@@ -520,26 +526,24 @@ describe('Parse User', () => {
       });
   });
 
-  it('can count users', done => {
+  it('can count users', async () => {
     const james = new Parse.User();
     james.set('username', 'james');
     james.set('password', 'mypass');
-    james
-      .signUp()
-      .then(() => {
-        const kevin = new Parse.User();
-        kevin.set('username', 'kevin');
-        kevin.set('password', 'mypass');
-        return kevin.signUp();
-      })
-      .then(() => {
-        const query = new Parse.Query(Parse.User);
-        return query.count();
-      })
-      .then(c => {
-        assert.equal(c, 2);
-        done();
-      });
+    const acl = new Parse.ACL();
+    acl.setPublicReadAccess(true);
+    james.setACL(acl);
+    await james.signUp();
+    const kevin = new Parse.User();
+    kevin.set('username', 'kevin');
+    kevin.set('password', 'mypass');
+    kevin.setACL(acl);
+    await kevin.signUp();
+
+    const query = new Parse.Query(Parse.User);
+    const c = await query.count();
+
+    assert.equal(c, 2);
   });
 
   it('can sign up user with container class', done => {
@@ -953,21 +957,13 @@ describe('Parse User', () => {
 
   it('can link with twitter', async () => {
     Parse.User.enableUnsafeCurrentUser();
-    const authData = {
-      id: 227463280,
-      consumer_key: '5QiVwxr8FQHbo5CMw46Z0jquF',
-      consumer_secret: 'p05FDlIRAnOtqJtjIt0xcw390jCcjj56QMdE9B52iVgOEb7LuK',
-      auth_token: '227463280-lngpMGXdnG36JiuzGfAYbKcZUPwjmcIV2NqL9hWc',
-      auth_token_secret: 'G1tl1R0gaYKTyxw0uYJDKRoVhM16ifyLeMwIaKlFtPkQr',
-    };
     const user = new Parse.User();
     user.setUsername(uuidv4());
     user.setPassword(uuidv4());
     await user.signUp();
 
-    await user.linkWith('twitter', { authData });
-
-    expect(user.get('authData').twitter.id).toBe(authData.id);
+    await user.linkWith('twitter', { authData: twitterAuthData });
+    expect(user.get('authData').twitter.id).toBe(twitterAuthData.id);
     expect(user._isLinked('twitter')).toBe(true);
 
     await user._unlinkFrom('twitter');
@@ -977,25 +973,18 @@ describe('Parse User', () => {
   it('can link with twitter and facebook', async () => {
     Parse.User.enableUnsafeCurrentUser();
     Parse.FacebookUtils.init();
-    const authData = {
-      id: 227463280,
-      consumer_key: '5QiVwxr8FQHbo5CMw46Z0jquF',
-      consumer_secret: 'p05FDlIRAnOtqJtjIt0xcw390jCcjj56QMdE9B52iVgOEb7LuK',
-      auth_token: '227463280-lngpMGXdnG36JiuzGfAYbKcZUPwjmcIV2NqL9hWc',
-      auth_token_secret: 'G1tl1R0gaYKTyxw0uYJDKRoVhM16ifyLeMwIaKlFtPkQr',
-    };
     const user = new Parse.User();
     user.setUsername(uuidv4());
     user.setPassword(uuidv4());
     await user.signUp();
 
-    await user.linkWith('twitter', { authData });
+    await user.linkWith('twitter', { authData: twitterAuthData });
     await Parse.FacebookUtils.link(user);
 
     expect(Parse.FacebookUtils.isLinked(user)).toBe(true);
     expect(user._isLinked('twitter')).toBe(true);
 
-    expect(user.get('authData').twitter.id).toBe(authData.id);
+    expect(user.get('authData').twitter.id).toBe(twitterAuthData.id);
     expect(user.get('authData').facebook.id).toBe('test');
   });
 

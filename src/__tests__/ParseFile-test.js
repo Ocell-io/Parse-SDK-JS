@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2015-present, Parse, LLC.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
 /* global File */
 jest.autoMockOff();
 jest.mock('http');
@@ -60,18 +52,52 @@ describe('ParseFile', () => {
     process.env.PARSE_BUILD = 'node';
   });
 
-  it('can create files with base64 encoding', () => {
+  it('can create files with base64 encoding (no padding)', () => {
+    const file = new ParseFile('parse.txt', { base64: 'YWJj' });
+    expect(file._source.base64).toBe('YWJj');
+    expect(file._source.type).toBe('text/plain');
+    expect(file._data).toBe('YWJj');
+  });
+
+  it('can create files with base64 encoding (1 padding)', () => {
+    const file = new ParseFile('parse.txt', { base64: 'YWI=' });
+    expect(file._source.base64).toBe('YWI=');
+    expect(file._source.type).toBe('text/plain');
+    expect(file._data).toBe('YWI=');
+  });
+
+  it('can create files with base64 encoding (2 padding)', () => {
     const file = new ParseFile('parse.txt', { base64: 'ParseA==' });
     expect(file._source.base64).toBe('ParseA==');
-    expect(file._source.type).toBe('');
+    expect(file._source.type).toBe('text/plain');
+    expect(file._data).toBe('ParseA==');
+  });
+
+  it('can set the default type to be text/plain when using base64', () => {
+    const file = new ParseFile('parse.txt', {
+      base64: 'data:;base64,ParseA==',
+    });
+    expect(file._source.base64).toBe('ParseA==');
+    expect(file._source.type).toBe('text/plain');
+    expect(file._data).toBe('ParseA==');
   });
 
   it('can extract data type from base64', () => {
-    const file = new ParseFile('parse.txt', {
+    const file = new ParseFile('parse.png', {
       base64: 'data:image/png;base64,ParseA==',
     });
     expect(file._source.base64).toBe('ParseA==');
     expect(file._source.type).toBe('image/png');
+    expect(file._data).toBe('ParseA==');
+  });
+
+  it('can extract data type from base64 with a filename parameter', () => {
+    const file = new ParseFile('parse.pdf', {
+      base64: 'data:application/pdf;filename=parse.pdf;base64,ParseA==',
+    });
+    expect(file._source.base64).toBe('ParseA==');
+    expect(file._source.type).toBe('application/pdf');
+    expect(file._data).toBe('ParseA==');
   });
 
   it('can create files with file uri', () => {
@@ -88,6 +114,7 @@ describe('ParseFile', () => {
     });
     expect(file._source.base64).toBe('ParseA==');
     expect(file._source.type).toBe('audio/m4a');
+    expect(file._data).toBe('ParseA==');
   });
 
   it('can extract data type from base64 with a complex mime type', () => {
@@ -96,6 +123,7 @@ describe('ParseFile', () => {
     });
     expect(file._source.base64).toBe('ParseA==');
     expect(file._source.type).toBe('application/vnd.google-earth.kml+xml');
+    expect(file._data).toBe('ParseA==');
   });
 
   it('can extract data type from base64 with a charset param', () => {
@@ -104,18 +132,21 @@ describe('ParseFile', () => {
     });
     expect(file._source.base64).toBe('ParseA==');
     expect(file._source.type).toBe('application/vnd.3gpp.pic-bw-var');
+    expect(file._data).toBe('ParseA==');
   });
 
   it('can create files with byte arrays', () => {
     const file = new ParseFile('parse.txt', [61, 170, 236, 120]);
     expect(file._source.base64).toBe('ParseA==');
     expect(file._source.type).toBe('');
+    expect(file._data).toBe('ParseA==');
   });
 
   it('can create files with all types of characters', () => {
     const file = new ParseFile('parse.txt', [11, 239, 191, 215, 80, 52]);
     expect(file._source.base64).toBe('C++/11A0');
     expect(file._source.type).toBe('');
+    expect(file._data).toBe('C++/11A0');
   });
 
   it('can create an empty file', () => {
@@ -313,6 +344,7 @@ describe('ParseFile', () => {
     const file = new ParseFile('parse.txt', [61, 170, 236, 120], '', metadata, tags);
     expect(file._source.base64).toBe('ParseA==');
     expect(file._source.type).toBe('');
+    expect(file._data).toBe('ParseA==');
     expect(file.metadata()).toBe(metadata);
     expect(file.tags()).toBe(tags);
   });
