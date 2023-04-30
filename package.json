@@ -1,5 +1,5 @@
 {
-  "name": "@ocell/parse",
+  "name": "parse",
   "version": "4.0.1",
   "description": "Parse JavaScript SDK",
   "homepage": "https://parseplatform.org",
