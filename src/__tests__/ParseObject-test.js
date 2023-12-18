@@ -1693,6 +1693,15 @@ describe('ParseObject', () => {
     expect(jsonBody._context).toEqual(context);
   });
 
+  it('unset ops are mentioned in toJSON()', () => {
+    const o = new ParseObject('Item');
+    o.set('unsetField', 1);
+    o.unset('unsetField');
+    expect(o.toJSON()).toEqual({
+      unsetField: { __op: 'Delete' },
+    });
+  });
+
   it('interpolates delete operations', done => {
     CoreManager.getRESTController()._setXHR(
       mockXHR([
