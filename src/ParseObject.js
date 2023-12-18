@@ -462,6 +462,13 @@ class ParseObject {
       }
     }
 
+    const pending = this._getPendingOps();
+    for (const attr in pending[0]) {
+      if (!(pending[0][attr] instanceof SetOp)) {
+        json[attr] = pending[0][attr].toJSON(offline);
+      }
+    }
+
     if (this.id) {
       json.objectId = this.id;
     }
