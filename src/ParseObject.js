@@ -464,9 +464,12 @@ class ParseObject {
 
     const pending = this._getPendingOps();
     for (const attr in pending[0]) {
-      if (!(pending[0][attr] instanceof SetOp)) {
-        json[attr] = pending[0][attr].toJSON(offline);
+      const path = attr.split('.');
+      let obj = json;
+      for (let i = 0; i < path.length - 1; i++) {
+        obj = obj[path[i]];
       }
+      obj[path[path.length - 1]] = pending[0][attr].toJSON(offline);
     }
 
     if (this.id) {
