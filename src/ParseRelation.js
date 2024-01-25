@@ -50,9 +50,12 @@ class ParseRelation {
         if (this.parent.id !== parent.id) {
           throw new Error('Internal Error. Relation retrieved from two different Objects.');
         }
+      } else if (parent.id) {
+        this.parent = parent;
       }
+    } else {
+      this.parent = parent;
     }
-    this.parent = parent;
   }
 
   /**
