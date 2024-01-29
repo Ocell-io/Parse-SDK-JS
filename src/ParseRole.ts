@@ -103,7 +103,7 @@ class ParseRole extends ParseObject {
     if (typeof newName !== 'string') {
       throw new ParseError(ParseError.OTHER_CAUSE, "A role's name must be a String.");
     }
-    if (!/^[0-9a-zA-Z\-_ ]+$/.test(newName)) {
+    if (!/^[0-9a-zäöüßA-ZÄÖÜ\-_ ]+$/.test(newName)) {
       throw new ParseError(
         ParseError.OTHER_CAUSE,
         "A role's name can be only contain alphanumeric characters, _, " + '-, and spaces.'
