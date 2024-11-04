@@ -1,6 +1,6 @@
 {
-  "name": "parse",
-  "version": "4.3.1+ocell",
+  "name": "@ocell/parse",
+  "version": "4.3.1-ocell-1",
   "description": "Parse JavaScript SDK",
   "homepage": "https://parseplatform.org",
   "keywords": [
@@ -11,7 +11,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/parse-community/Parse-SDK-JS"
+    "url": "https://github.com/ocell-io/Parse-SDK-JS"
   },
   "bugs": "https://github.com/parse-community/Parse-SDK-JS/issues",
   "files": [
